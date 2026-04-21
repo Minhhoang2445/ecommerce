@@ -1,0 +1,35 @@
+# ==========================================
+# 1. DỮ LIỆU DOCKER VOLUMES (CỰC KỲ QUAN TRỌNG)
+# ==========================================
+# Chỉ đích danh các thư mục chứa raw data của database để không chặn nhầm thư mục chứa script init
+/inventory-service/mysql/
+/order-service/mysql/
+/product-service/data/
+
+# ==========================================
+# 2. FILE BUILD CỦA JAVA & MAVEN
+# ==========================================
+# Chặn thư mục target sinh ra sau khi build ở tất cả các service
+**/target/
+
+# Chặn các file nhị phân
+*.jar
+*.war
+*.class
+
+# ==========================================
+# 3. CẤU HÌNH IDE (Đặc thù từng máy, không chia sẻ)
+# ==========================================
+
+
+# VS Code
+.vscode/
+
+
+
+# ==========================================
+# 4. FILE HỆ ĐIỀU HÀNH & LOGS
+# ==========================================
+.DS_Store
+Thumbs.db
+*.log

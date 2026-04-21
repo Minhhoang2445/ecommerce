@@ -1,0 +1,15 @@
+services:
+  mysql_order:
+    image: mysql:8.3.0
+    container_name: mysql_order
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+    ports:
+      - "3308:3306"
+    volumes:
+      - ./mysql:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks: 
+      - ecommerce-network
+networks:
+  ecommerce-network:

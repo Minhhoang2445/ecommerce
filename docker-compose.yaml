@@ -1,0 +1,9 @@
+include:
+  - inventory-service/docker-compose.yaml
+  - order-service/docker-compose.yaml
+  - product-service/docker-compose.yaml
+  - rabbitMQ/docker-compose.yaml
+networks:
+  ecommerce-network:
+    driver: bridge
+

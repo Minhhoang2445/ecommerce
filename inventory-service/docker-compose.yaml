@@ -1,0 +1,24 @@
+version: '4'
+services:
+  mysql_inventory:
+    image: mysql:8.3.0
+    container_name: mysql_inventory
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./mysql:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks: 
+      - ecommerce-network
+  inventory-redis:
+    image: redis:alpine
+    container_name: inventory_redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    networks:
+      - ecommerce-network
+networks:
+  ecommerce-network:
