@@ -19,8 +19,8 @@ public class InventoryController {
 
     @GetMapping
     @ResponseStatus(org.springframework.http.HttpStatus.OK)
-    public boolean isInStock(@RequestParam String skuCode, @RequestParam Integer quantity) {
-        return inventoryService.isInStock(skuCode, quantity);
+    public boolean deductInventory(@RequestParam String skuCode, @RequestParam Integer quantity) {
+        return inventoryService.deductInventory(skuCode, quantity);
     }
     
     

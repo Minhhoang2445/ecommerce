@@ -18,7 +18,7 @@ public class OrderService {
     private final InventoryClient inventoryClient;
 
     public void placeOrder(OrderRequest orderRequest) {
-        var isInStock = inventoryClient.isInStock(orderRequest.skuCode(), orderRequest.quantity());
+        var isInStock = inventoryClient.deductInventory(orderRequest.skuCode(), orderRequest.quantity());
 
         if (!isInStock) {
             throw new RuntimeException("Product is not in stock");
