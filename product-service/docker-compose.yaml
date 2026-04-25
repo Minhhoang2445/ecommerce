@@ -1,15 +1,26 @@
 services:
   mongodb:
     image: mongo:7.0.5
-    container_name: mongodb
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
       MONGO_INITDB_DATABASE: product-service
     volumes:
       - ./data:/data/db
+    networks:
+      - ecommerce-network
+  product-service:
+    build: .
+    depends_on:
+      - mongodb 
+    env_file:
+      - .env
+    environment:
+      - MONGODB_HOST=mongodb
+    ports:
+      - "8080:8080"
     networks:
       - ecommerce-network
 networks:

@@ -1,10 +1,9 @@
-version: '4'
 services:
   mysql_inventory:
     image: mysql:8.3.0
     container_name: mysql_inventory
     environment:
-      MYSQL_ROOT_PASSWORD: mysql
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     ports:
       - "3307:3306"
     volumes:
@@ -18,6 +17,22 @@ services:
     command: ["redis-server", "--appendonly", "yes"]
     ports:
       - "6379:6379"
+    networks:
+      - ecommerce-network
+  inventory-service:
+    build: .
+    depends_on:
+      - mysql_inventory
+      - inventory-redis
+    ports:
+      - "8082:8082"
+    environment:
+      - MYSQL_HOST=mysql_inventory
+      - MYSQL_PORT=3306
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_ROOT_PASSWORD}
+      - REDIS_HOST=inventory-redis
+      - RABBITMQ_HOST=rabbitmq
     networks:
       - ecommerce-network
 networks:

@@ -1,0 +1,7 @@
+# Bỏ qua thư mục Database chứa cục data của MySQL
+mysql/
+
+# Bỏ qua các file rác của IDE (nếu có)
+.idea/
+.git/
+*.iml

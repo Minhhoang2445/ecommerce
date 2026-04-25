@@ -7,9 +7,7 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: myuser
       RABBITMQ_DEFAULT_PASS: 123456
-      # Dùng đúng chuẩn của Docker, nó sẽ tự căn thời gian nạp file chuẩn xác
-      RABBITMQ_LOAD_DEFINITIONS: /etc/rabbitmq/definitions.json
-    volumes:
-      - ./definitions.json:/etc/rabbitmq/definitions.json:ro
+
+    
     networks:
       - ecommerce-network

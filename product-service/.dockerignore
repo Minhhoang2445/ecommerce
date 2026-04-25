@@ -1,0 +1,8 @@
+# Bỏ qua thư mục Database
+data/
+data
+
+# Bỏ qua luôn các thư mục build cũ và file IDE để build cho lẹ
+.git/
+.idea/
+*.iml
