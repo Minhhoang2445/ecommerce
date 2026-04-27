@@ -24,8 +24,6 @@ services:
     depends_on:
       - mysql_inventory
       - inventory-redis
-    ports:
-      - "8082:8082"
     environment:
       - MYSQL_HOST=mysql_inventory
       - MYSQL_PORT=3306

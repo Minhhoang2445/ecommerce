@@ -16,8 +16,6 @@ services:
     depends_on:
       - mysql_order
       - inventory-service
-    ports:
-      - "8081:8081"
     environment:
     - MYSQL_HOST=mysql_order
     - MYSQL_PORT=3306

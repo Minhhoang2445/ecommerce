@@ -19,8 +19,6 @@ services:
       - .env
     environment:
       - MONGODB_HOST=mongodb
-    ports:
-      - "8080:8080"
     networks:
       - ecommerce-network
 networks:

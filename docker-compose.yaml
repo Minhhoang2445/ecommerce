@@ -1,9 +1,9 @@
 include:
-  
   - rabbitMQ/docker-compose.yaml
   - inventory-service/docker-compose.yaml
   - order-service/docker-compose.yaml
   - product-service/docker-compose.yaml
+  - ApiGateway/docker-compose.yaml
 networks:
   ecommerce-network:
     driver: bridge
@@ -14,3 +14,8 @@ services:
     depends_on:
       - mysql_order
       - inventory-service
+  api-gateway:
+    depends_on:
+      - order-service
+      - inventory-service
+      - product-service
