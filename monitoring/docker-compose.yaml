@@ -1,0 +1,52 @@
+# monitoring/docker-compose.yaml
+
+services:
+  # 1. cAdvisor: Người đọc các chỉ số CPU/RAM của Docker
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    ports:
+      - "8088:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw # Thử dùng rw như dự án kia
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    networks:
+      - ecommerce-network # Tên mạng lưới chung
+
+  # 2. Prometheus: Cơ sở dữ liệu Time-series để lưu lịch sử
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    depends_on: 
+      - cadvisor
+    networks:
+      - ecommerce-network
+
+  # 3. Grafana: Giao diện vẽ biểu đồ
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env # Gọi file .env vào
+    environment:
+      # Gán biến môi trường từ file .env cho Grafana
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+    depends_on:
+      - prometheus
+    networks:
+      - ecommerce-network
+
+# BÍ QUYẾT Ở ĐÂY: Khai báo mạng dùng chung
+networks:
+  ecommerce-network:

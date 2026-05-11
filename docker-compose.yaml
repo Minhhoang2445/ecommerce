@@ -4,9 +4,10 @@ include:
   - order-service/docker-compose.yaml
   - product-service/docker-compose.yaml
   - ApiGateway/docker-compose.yaml
+  - monitoring/docker-compose.yaml
 networks:
   ecommerce-network:
-    driver: bridge
+    driver: overlay
 
 services:
   order-service:
@@ -14,6 +15,7 @@ services:
     depends_on:
       - mysql_order
       - inventory-service
+    
   api-gateway:
     depends_on:
       - order-service

@@ -19,6 +19,7 @@ services:
       - "6379:6379"
     networks:
       - ecommerce-network
+
   inventory-service:
     build: .
     depends_on:
@@ -31,7 +32,12 @@ services:
       - SPRING_DATASOURCE_PASSWORD=${DB_ROOT_PASSWORD}
       - REDIS_HOST=inventory-redis
       - RABBITMQ_HOST=rabbitmq
+    deploy: 
+      replicas: 3
+      endpoint_mode: dnsrr
     networks:
       - ecommerce-network
+
+
 networks:
   ecommerce-network:

@@ -1,0 +1,256 @@
+services:
+  api-gateway:
+    image: nginx:alpine
+    networks:
+      ecommerce-network: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: 8888
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /home/minhhoang/Desktop/ecommerce/ApiGateway/nginx.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
+        bind: {}
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+  cadvisor:
+    container_name: cadvisor
+    image: gcr.io/cadvisor/cadvisor:latest
+    networks:
+      ecommerce-network: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: 8088
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /
+        target: /rootfs
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /var/run
+        target: /var/run
+        bind: {}
+      - type: bind
+        source: /sys
+        target: /sys
+        read_only: true
+        bind: {}
+      - type: bind
+        source: /var/lib/docker/
+        target: /var/lib/docker
+        read_only: true
+        bind: {}
+    deploy:
+      mode: global
+  grafana:
+    container_name: grafana
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: MatKhauSieuKho123!
+      GF_SECURITY_ADMIN_USER: admin
+      GRAFANA_PASSWORD: MatKhauSieuKho123!
+      GRAFANA_USER: admin
+    image: grafana/grafana:latest
+    networks:
+      ecommerce-network: null
+    ports:
+      - mode: ingress
+        target: 3000
+        published: 3000
+        protocol: tcp
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+  inventory-redis:
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+    container_name: inventory_redis
+    image: redis:alpine
+    networks:
+      ecommerce-network: null
+    ports:
+      - mode: ingress
+        target: 6379
+        published: 6379
+        protocol: tcp
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+  inventory-service:
+    image: minhhoang2445/ecommerce-inventory-service:latest
+    build:
+      context: /home/minhhoang/Desktop/ecommerce/inventory-service
+      dockerfile: Dockerfile
+    deploy:
+      replicas: 3
+      endpoint_mode: dnsrr
+    environment:
+      MYSQL_HOST: mysql_inventory
+      MYSQL_PORT: "3306"
+      RABBITMQ_HOST: rabbitmq
+      REDIS_HOST: inventory-redis
+      SPRING_DATASOURCE_PASSWORD: mysql
+      SPRING_DATASOURCE_USERNAME: root
+    networks:
+      ecommerce-network: null
+  mongodb:
+    environment:
+      MONGO_INITDB_DATABASE: product-service
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_ROOT_USERNAME: root
+    image: mongo:7.0.5
+    networks:
+      ecommerce-network: null
+    ports:
+      - mode: ingress
+        target: 27017
+        published: 27017
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /home/minhhoang/Desktop/ecommerce/product-service/data
+        target: /data/db
+        bind: {}
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+  mysql_inventory:
+    container_name: mysql_inventory
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+    image: mysql:8.3.0
+    networks:
+      ecommerce-network: null
+    ports:
+      - mode: ingress
+        target: 3306
+        published: 3307
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /home/minhhoang/Desktop/ecommerce/inventory-service/mysql
+        target: /var/lib/mysql
+        bind: {}
+      - type: bind
+        source: /home/minhhoang/Desktop/ecommerce/inventory-service/docker/mysql/init.sql
+        target: /docker-entrypoint-initdb.d/init.sql
+        bind: {}
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+  mysql_order:
+    container_name: mysql_order
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+    image: mysql:8.3.0
+    networks:
+      ecommerce-network: null
+    ports:
+      - mode: ingress
+        target: 3306
+        published: 3308
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /home/minhhoang/Desktop/ecommerce/order-service/mysql
+        target: /var/lib/mysql
+        bind: {}
+      - type: bind
+        source: /home/minhhoang/Desktop/ecommerce/order-service/docker/mysql/init.sql
+        target: /docker-entrypoint-initdb.d/init.sql
+        bind: {}
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+  order-service:
+    image: minhhoang2445/ecommerce-order-service:latest
+    build:
+      context: /home/minhhoang/Desktop/ecommerce/order-service
+      dockerfile: Dockerfile
+    deploy:
+      replicas: 3
+      endpoint_mode: dnsrr
+    environment:
+      INVENTORY_URL: http://inventory-service:8082
+      MYSQL_HOST: mysql_order
+      MYSQL_PORT: "3306"
+      SPRING_DATASOURCE_PASSWORD: mysql
+      SPRING_DATASOURCE_USERNAME: root
+    networks:
+      ecommerce-network: null
+  product-service:
+    image: minhhoang2445/ecommerce-product-service:latest
+    build:
+      context: /home/minhhoang/Desktop/ecommerce/product-service
+      dockerfile: Dockerfile
+    deploy:
+      replicas: 3
+      endpoint_mode: dnsrr
+    environment:
+      DB_PASSWORD: password
+      DB_USER: root
+      MONGODB_HOST: mongodb
+    networks:
+      ecommerce-network: null
+  prometheus:
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    container_name: prometheus
+    image: prom/prometheus:latest
+    networks:
+      ecommerce-network: null
+    ports:
+      - mode: ingress
+        target: 9090
+        published: 9090
+        protocol: tcp
+    volumes:
+      - type: bind
+        source: /home/minhhoang/Desktop/ecommerce/monitoring/prometheus/prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+        read_only: true
+        bind: {}
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+  rabbitmq:
+    environment:
+      RABBITMQ_DEFAULT_PASS: "123456"
+      RABBITMQ_DEFAULT_USER: myuser
+    image: rabbitmq:3-management
+    networks:
+      ecommerce-network: null
+    ports:
+      - mode: ingress
+        target: 5672
+        published: 5672
+        protocol: tcp
+      - mode: ingress
+        target: 15672
+        published: 15672
+        protocol: tcp
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+networks:
+  ecommerce-network:
+    name: ecommerce_ecommerce-network
+    driver: overlay
+
+

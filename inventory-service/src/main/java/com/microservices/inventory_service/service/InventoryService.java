@@ -25,8 +25,8 @@ public class InventoryService {
     // SỬA Ở ĐÂY: Dùng Producer xịn xò của chúng ta thay vì RabbitTemplate thô
     private final InventoryProducer inventoryProducer;
 
-    // public boolean isInStock(String skuCode, Integer quantity) {
-    //     return inventoryRepository.existsBySkuCodeAndQuantityIsGreaterThanEqual(skuCode, quantity);
+// public boolean isInStock(String skuCode, Integer quantity) {
+//     return inventoryRepository.existsBySkuCodeAndQuantityIsGreaterThanEqual(skuCode, quantity);
     // }
 
     public boolean deductInventory(String skuCode, Integer quantity) {

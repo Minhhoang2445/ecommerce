@@ -19,6 +19,9 @@ services:
       - .env
     environment:
       - MONGODB_HOST=mongodb
+    deploy: 
+      replicas: 3
+      endpoint_mode: dnsrr
     networks:
       - ecommerce-network
 networks:
